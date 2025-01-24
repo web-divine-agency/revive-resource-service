@@ -29,6 +29,7 @@ portal.use(authenticated);
  */
 app.use("/admin", admin);
 admin.use(authAdmin);
+admin.get("/res/branches", BranchController.list);
 admin.post("/res/branches", BranchController.create);
 
 /**

@@ -5,7 +5,7 @@ import MysqlService from "../services/MysqlService.js";
 
 export default {
   /**
-   * List of users
+   * List of branches
    * @param {*} req
    * @param {*} res
    * @returns
@@ -28,39 +28,22 @@ export default {
       return res.json(message);
     }
 
-    const { show, page, role } = req.query;
+    const { show, page } = req.query;
 
     let query = `
       SELECT
-        users.id,
-        users.first_name,
-        users.last_name,
-        users.username,
-        users.gender,
-        users.email,
-        users.mobile,
-        users.verified_at,
-        users.created_at,
-        users.created_at_order,
-        users.updated_at,
-        users.updated_at_order,
-        roles.id as role_id,
-        roles.name as role_name,
-        roles.description as role_description
-      FROM users
-      INNER JOIN user_roles ON users.id = user_roles.user_id
-      INNER JOIN roles ON user_roles.role_id = roles.id
-      WHERE roles.name LIKE "%${role}%" 
-      AND users.deleted_at IS NULL
+        *
+      FROM branches
+      WHERE deleted_at IS NULL
     `;
 
-    MysqlService.paginate(query, "users.id", show, page)
+    MysqlService.paginate(query, "id", show, page)
       .then((response) => {
         res.status(200);
 
         let message = {
           endpoint: `${req.method} ${req.originalUrl} ${res.statusCode}`,
-          users: response,
+          branches: response,
         };
 
         Logger.out([JSON.stringify(message)]);
