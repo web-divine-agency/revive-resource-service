@@ -10,116 +10,21 @@ var mysqlClient = mysql.createPool({
   queueLimit: 0,
 });
 
-var enums = [
-  "create_users_table",
-  "create_permissions_table",
-  "create_roles_table",
-  "create_role_permissions_table",
-  "create_user_roles_table",
-  "create_user_branches_table",
-  "create_user_ticket_types_table",
-  "create_reset_passwords_table",
-];
+var enums = ["create_branches_table"];
 
 var statements = [
   // create_users_table
-  `CREATE TABLE users (${[
-    "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
-    "first_name VARCHAR(255) NOT NULL",
-    "last_name VARCHAR(255) NOT NULL",
-    "gender VARCHAR(255) NULL",
-    "username VARCHAR(255) NOT NULL UNIQUE",
-    "email VARCHAR(255) NOT NULL UNIQUE",
-    "mobile VARCHAR(255) NULL",
-    "password VARCHAR(255) NOT NULL",
-    "verified_at TIMESTAMP NULL",
-    "verified_at_order DOUBLE NULL",
-    "created_at TIMESTAMP NULL",
-    "created_at_order DOUBLE NULL",
-    "updated_at TIMESTAMP NULL",
-    "updated_at_order DOUBLE NULL",
-    "deleted_at TIMESTAMP NULL",
-    "deleted_at_order DOUBLE NULL",
-  ]})`,
-  // create_permissions_table
-  `CREATE TABLE permissions (${[
+  `CREATE TABLE branches (${[
     "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
     "name VARCHAR(255) NOT NULL",
-    "description TEXT NULL",
-    "created_at TIMESTAMP NULL",
-    "created_at_order DOUBLE NULL",
-    "updated_at TIMESTAMP NULL",
-    "updated_at_order DOUBLE NULL",
-    "deleted_at TIMESTAMP NULL",
-    "deleted_at_order DOUBLE NULL",
-  ]})`,
-  // create_roles_table
-  `CREATE TABLE roles (${[
-    "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
-    "name VARCHAR(255) NOT NULL",
-    "description TEXT NULL",
-    "created_at TIMESTAMP NULL",
-    "created_at_order DOUBLE NULL",
-    "updated_at TIMESTAMP NULL",
-    "updated_at_order DOUBLE NULL",
-    "deleted_at TIMESTAMP NULL",
-    "deleted_at_order DOUBLE NULL",
-  ]})`,
-  // create_role_permissions_table
-  `CREATE TABLE role_permissions (${[
-    "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
-    "role_id BIGINT UNSIGNED NOT NULL",
-    "permission_id BIGINT UNSIGNED NOT NULL",
-    "created_at TIMESTAMP NULL",
-    "created_at_order DOUBLE NULL",
-    "updated_at TIMESTAMP NULL",
-    "updated_at_order DOUBLE NULL",
-    "deleted_at TIMESTAMP NULL",
-    "deleted_at_order DOUBLE NULL",
-  ]})`,
-  // create_user_roles_table
-  `CREATE TABLE user_roles (${[
-    "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
-    "user_id BIGINT UNSIGNED NOT NULL",
-    "role_id BIGINT UNSIGNED NOT NULL",
-    "created_at TIMESTAMP NULL",
-    "created_at_order DOUBLE NULL",
-    "updated_at TIMESTAMP NULL",
-    "updated_at_order DOUBLE NULL",
-    "deleted_at TIMESTAMP NULL",
-    "deleted_at_order DOUBLE NULL",
-  ]})`,
-  // create_user_branches_table
-  `CREATE TABLE user_branches (${[
-    "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
-    "user_id BIGINT UNSIGNED NOT NULL",
-    "branch_id BIGINT UNSIGNED NOT NULL",
-    "created_at TIMESTAMP NULL",
-    "created_at_order DOUBLE NULL",
-    "updated_at TIMESTAMP NULL",
-    "updated_at_order DOUBLE NULL",
-    "deleted_at TIMESTAMP NULL",
-    "deleted_at_order DOUBLE NULL",
-  ]})`,
-  // create_user_ticket_types_table
-  `CREATE TABLE user_ticket_types (${[
-    "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
-    "user_id BIGINT UNSIGNED NOT NULL",
-    "ticket_type_id BIGINT UNSIGNED NOT NULL",
-    "created_at TIMESTAMP NULL",
-    "created_at_order DOUBLE NULL",
-    "updated_at TIMESTAMP NULL",
-    "updated_at_order DOUBLE NULL",
-    "deleted_at TIMESTAMP NULL",
-    "deleted_at_order DOUBLE NULL",
-  ]})`,
-  // create_reset_passwords_table
-  `CREATE TABLE reset_passwords (${[
-    "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
-    "user_id BIGINT UNSIGNED NOT NULL",
-    "token VARCHAR(255) NOT NULL",
-    "expires_at TIMESTAMP NULL",
-    "expires_at_order DOUBLE NULL",
+    "address_line_1 VARCHAR(255) NULL",
+    "address_line_2 VARCHAR(255) NULL",
+    "city VARCHAR(255) NULL",
+    "state VARCHAR(255) NULL",
+    "country VARCHAR(255) NULL",
+    "zip_code INT NULL",
+    "opening TIME NULL",
+    "closing TIME NULL",
     "created_at TIMESTAMP NULL",
     "created_at_order DOUBLE NULL",
     "updated_at TIMESTAMP NULL",

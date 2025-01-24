@@ -29,7 +29,7 @@ portal.use(authenticated);
  */
 app.use("/admin", admin);
 admin.use(authAdmin);
-admin.post("/res/users", BranchController.create);
+admin.post("/res/branches", BranchController.create);
 
 /**
  * Base routes
