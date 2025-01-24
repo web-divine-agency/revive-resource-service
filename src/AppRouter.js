@@ -32,6 +32,8 @@ admin.use(authAdmin);
 admin.get("/res/branches", BranchController.list);
 admin.post("/res/branches", BranchController.create);
 
+admin.get("/fn/branches-all", BranchController.all);
+
 /**
  * Base routes
  */

@@ -5,6 +5,37 @@ import MysqlService from "../services/MysqlService.js";
 
 export default {
   /**
+   * List all branches without pagination
+   * @param {*} req
+   * @param {*} res
+   */
+  all: (req, res) => {
+    MysqlService.select(`SELECT * FROM branches WHERE deleted_at IS NULL`)
+      .then((response) => {
+        res.status(200);
+
+        let message = {
+          endpoint: `${req.method} ${req.originalUrl} ${res.statusCode}`,
+          branches: response,
+        };
+
+        Logger.out([JSON.stringify(message)]);
+        return res.json(message);
+      })
+      .catch((error) => {
+        res.status(500);
+
+        let message = {
+          endpoint: `${req.method} ${req.originalUrl} ${res.statusCode}`,
+          error: error,
+        };
+
+        Logger.error([JSON.stringify(message)]);
+        return res.json(message);
+      });
+  },
+  
+  /**
    * List of branches
    * @param {*} req
    * @param {*} res
