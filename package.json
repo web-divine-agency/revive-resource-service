@@ -1,7 +1,7 @@
 {
-  "name": "revive-user-service",
+  "name": "revive-branch-service",
   "version": "1.0.0",
-  "description": "API service for users management",
+  "description": "API service for branches management",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/web-divine-agency/revive-user-service.git"
+    "url": "git+ssh://git@github.com/web-divine-agency/revive-branch-service.git"
   },
   "author": "tony-tripulca",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/web-divine-agency/revive-user-service/issues"
+    "url": "https://github.com/web-divine-agency/revive-branch-service/issues"
   },
-  "homepage": "https://github.com/web-divine-agency/revive-user-service#readme",
+  "homepage": "https://github.com/web-divine-agency/revive-branch-service#readme",
   "dependencies": {
     "axios": "^1.7.2",
     "cors": "^2.8.5",
