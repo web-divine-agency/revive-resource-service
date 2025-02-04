@@ -5,7 +5,7 @@ import MysqlService from "../services/MysqlService.js";
 
 export default {
   /**
-   * List all branches without pagination
+   * List all resource categories without pagination
    * @param {*} req
    * @param {*} res
    */
@@ -24,7 +24,7 @@ export default {
   },
 
   /**
-   * List of branches
+   * List resource categories
    * @param {*} req
    * @param {*} res
    * @returns
@@ -72,7 +72,7 @@ export default {
   },
 
   /**
-   * Create branch
+   * Create resource category
    * @param {*} req
    * @param {*} res
    * @returns
@@ -100,10 +100,80 @@ export default {
   },
 
   /**
-   * Delete resource
-   * @param {*} req 
-   * @param {*} res 
-   * @returns 
+   * Read resource category
+   * @param {*} req
+   * @param {*} res
+   * @returns
+   */
+  read: (req, res) => {
+    let validation = Validator.check([Validator.required(req.params, "resource_category_id")]);
+
+    if (!validation.pass) {
+      let message = Logger.message(req, res, 422, "error", validation.result);
+      Logger.error([JSON.stringify(message)]);
+      return res.json(message);
+    }
+
+    const { resource_category_id } = req.params;
+
+    let query = `
+      SELECT
+        *
+      FROM resource_categories
+      WHERE deleted_at IS NULL
+      AND id = ${resource_category_id}
+    `;
+
+    MysqlService.select(query)
+      .then((response) => {
+        let message = Logger.message(req, res, 200, "resource_category", response[0]);
+        Logger.out([JSON.stringify(message)]);
+        return res.json(message);
+      })
+      .catch((error) => {
+        let message = Logger.message(req, res, 500, "error", error);
+        Logger.error([JSON.stringify(message)]);
+        return res.json(message);
+      });
+  },
+
+  update: (req, res) => {
+    let validation = Validator.check([
+      Validator.required(req.params, "resource_category_id"),
+      Validator.required(req.body, "name"),
+    ]);
+
+    if (!validation.pass) {
+      let message = Logger.message(req, res, 422, "error", validation.result);
+      Logger.error([JSON.stringify(message)]);
+      return res.json(message);
+    }
+
+    const { resource_category_id } = req.params;
+    const { name, description } = req.body;
+
+    MysqlService.update(
+      "resource_categories",
+      { name: name, description: description },
+      { id: resource_category_id }
+    )
+      .then(() => {
+        let message = Logger.message(req, res, 200, "updated", true);
+        Logger.error([JSON.stringify(message)]);
+        return res.json(message);
+      })
+      .catch((error) => {
+        let message = Logger.message(req, res, 500, "error", error);
+        Logger.error([JSON.stringify(message)]);
+        return res.json(message);
+      });
+  },
+
+  /**
+   * Delete resource category
+   * @param {*} req
+   * @param {*} res
+   * @returns
    */
   delete: (req, res) => {
     let validation = Validator.check([Validator.required(req.params, "resource_category_id")]);

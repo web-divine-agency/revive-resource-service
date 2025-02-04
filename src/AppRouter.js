@@ -35,6 +35,8 @@ admin.post("/res/resources", ResourceController.create);
 
 admin.get("/res/resource-categories", ResourceCategoryController.list);
 admin.post("/res/resource-categories", ResourceCategoryController.create);
+admin.get("/res/resource-categories/:resource_category_id", ResourceCategoryController.read);
+admin.put("/res/resource-categories/:resource_category_id", ResourceCategoryController.update);
 admin.delete("/res/resource-categories/:resource_category_id", ResourceCategoryController.delete);
 
 admin.get("/fn/resource-categories-all", ResourceCategoryController.all);
