@@ -1,1 +1,1 @@
-# Revive Pharmacy Branches Management API
+# Revive Pharmacy Resources Management API

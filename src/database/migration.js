@@ -10,21 +10,31 @@ var mysqlClient = mysql.createPool({
   queueLimit: 0,
 });
 
-var enums = ["create_branches_table"];
+var enums = ["create_resources_table", "create_resource_categories_table"];
 
 var statements = [
-  // create_users_table
-  `CREATE TABLE branches (${[
+  // create_resources_table
+  `CREATE TABLE resources (${[
+    "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
+    "user_id BIGINT UNSIGNED NOT NULL",
+    "category_id BIGINT UNSIGNED NOT NULL",
+    "title VARCHAR(255) NOT NULL",
+    "body TEXT NULL",
+    "additional_fields LONGTEXT NULL",
+    "link VARCHAR(255) NULL",
+    "status VARCHAR(255) NULL",
+    "created_at TIMESTAMP NULL",
+    "created_at_order DOUBLE NULL",
+    "updated_at TIMESTAMP NULL",
+    "updated_at_order DOUBLE NULL",
+    "deleted_at TIMESTAMP NULL",
+    "deleted_at_order DOUBLE NULL",
+  ]})`,
+  // create_resource_categories_table
+  `CREATE TABLE resource_categories (${[
     "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY",
     "name VARCHAR(255) NOT NULL",
-    "address_line_1 VARCHAR(255) NULL",
-    "address_line_2 VARCHAR(255) NULL",
-    "city VARCHAR(255) NULL",
-    "state VARCHAR(255) NULL",
-    "country VARCHAR(255) NULL",
-    "zip_code INT NULL",
-    "opening TIME NULL",
-    "closing TIME NULL",
+    "description TEXT NULL",
     "created_at TIMESTAMP NULL",
     "created_at_order DOUBLE NULL",
     "updated_at TIMESTAMP NULL",

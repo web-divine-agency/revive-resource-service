@@ -7,7 +7,7 @@ import { app } from "./Server.js";
 import { authAdmin, authenticated } from "./middleware/auth.js";
 
 import Controller from "./controllers/Controller.js";
-import BranchController from "./controllers/BranchController.js";
+import ResourceController from "./controllers/ResourceController.js";
 
 if (process.env.APP_ENV === "dev") {
   app.use(cors());
@@ -29,10 +29,8 @@ portal.use(authenticated);
  */
 app.use("/admin", admin);
 admin.use(authAdmin);
-admin.get("/res/branches", BranchController.list);
-admin.post("/res/branches", BranchController.create);
-
-admin.get("/fn/branches-all", BranchController.all);
+admin.get("/res/resources", ResourceController.list);
+admin.post("/res/resources", ResourceController.create);
 
 /**
  * Base routes
