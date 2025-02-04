@@ -65,10 +65,10 @@ export default {
   /**
    * Delete resource
    * @param {*} table
-   * @param {*} id
+   * @param {*} params
    * @returns
    */
-  delete: (table, id) => {
+  delete: (table, params) => {
     let date = moment();
 
     let data = {
@@ -78,22 +78,29 @@ export default {
       deleted_at_order: parseInt(date.format("YYYYMMDDHHmmss")),
     };
 
-    let query = `UPDATE ${table} SET ? WHERE id=${id}`;
-
     return new Promise((resolve, reject) => {
       mysqlClient.getConnection((err, con) => {
         if (err) {
           return reject(err);
         }
 
-        con.query(query, [data], (e, result) => {
-          con.release();
+        // Convert data object into a WHERE clause
+        let where = Object.entries(params)
+          .map(([key]) => `${key} = ?`)
+          .join(" AND ");
 
-          if (e) {
-            return reject(e);
+        con.query(
+          `UPDATE ${table} SET ? WHERE ${where}`,
+          [data, ...Object.values(params)],
+          (e, result) => {
+            con.release();
+
+            if (e) {
+              return reject(e);
+            }
+            return resolve(result);
           }
-          return resolve(result);
-        });
+        );
       });
     });
   },

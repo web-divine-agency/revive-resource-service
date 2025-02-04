@@ -98,4 +98,34 @@ export default {
         return res.json(message);
       });
   },
+
+  /**
+   * Delete resource
+   * @param {*} req 
+   * @param {*} res 
+   * @returns 
+   */
+  delete: (req, res) => {
+    let validation = Validator.check([Validator.required(req.params, "resource_category_id")]);
+
+    if (!validation.pass) {
+      let message = Logger.message(req, res, 422, "error", validation.result);
+      Logger.error([JSON.stringify(message)]);
+      return res.json(message);
+    }
+
+    const { resource_category_id } = req.params;
+
+    MysqlService.delete("resource_categories", { id: resource_category_id })
+      .then(() => {
+        let message = Logger.message(req, res, 200, "deleted", true);
+        Logger.out([JSON.stringify(message)]);
+        return res.json(message);
+      })
+      .catch((error) => {
+        let message = Logger.message(req, res, 200, "error", error);
+        Logger.error([JSON.stringify(message)]);
+        return res.json(message);
+      });
+  },
 };
