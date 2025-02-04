@@ -19,6 +19,7 @@ var statements = [
     "user_id BIGINT UNSIGNED NOT NULL",
     "category_id BIGINT UNSIGNED NOT NULL",
     "title VARCHAR(255) NOT NULL",
+    "slug VARCHAR(255) NOT NULL UNIQUE",
     "body TEXT NULL",
     "additional_fields LONGTEXT NULL",
     "link VARCHAR(255) NULL",

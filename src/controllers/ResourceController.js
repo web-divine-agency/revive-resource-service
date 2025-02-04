@@ -24,13 +24,14 @@ export default {
   },
 
   /**
-   * List of branches
+   * List resources
    * @param {*} req
    * @param {*} res
    * @returns
    */
   list: (req, res) => {
     let validation = Validator.check([
+      Validator.required(req.query, "category_id"),
       Validator.required(req.query, "show"),
       Validator.required(req.query, "page"),
     ]);
@@ -41,33 +42,42 @@ export default {
       return res.json(message);
     }
 
-    const { show, page } = req.query;
-    let name = req.query.name || "";
+    const { category_id, show, page } = req.query;
     let find = req.query.find || "";
-    let sort_by = req.query.sort_by || "name";
+    let sort_by = req.query.sort_by || "resources.created_at_order";
 
     let query = `
       SELECT
-        *
-      FROM branches
-      WHERE deleted_at IS NULL
-      AND name LIKE "%${name}%" 
+        resources.id AS resource_id,
+        resources.category_id,
+        users.id AS user_id,
+        resources.title,
+        resources.slug,
+        resources.body,
+        resources.additional_fields,
+        resources.link,
+        resources.status,
+        users.first_name,
+        users.last_name,
+        users.email
+      FROM resources
+      INNER JOIN users ON resources.user_id = users.id
+      WHERE resources.deleted_at IS NULL
+      AND resources.category_id = ${category_id}
       AND 
         (
-          name LIKE "%${find}%" OR
-          opening LIKE "%${find}%" OR
-          closing LIKE "%${find}%" OR
-          address_line_1 LIKE "%${find}%" OR
-          address_line_2 LIKE "%${find}%" OR
-          city LIKE "%${find}%" OR
-          state LIKE "%${find}%"
+          resources.title LIKE "%${find}%" OR
+          resources.status LIKE "%${find}%" OR
+          users.first_name LIKE "%${find}%" OR
+          users.last_name LIKE "%${find}%" OR
+          users.email LIKE "%${find}%"
         )
        ORDER BY ${sort_by} ASC
     `;
 
-    MysqlService.paginate(query, "id", show, page)
+    MysqlService.paginate(query, "resources.id", show, page)
       .then((response) => {
-        let message = Logger.message(req, res, 200, "branches", response);
+        let message = Logger.message(req, res, 200, "resources", response);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
@@ -89,6 +99,7 @@ export default {
       Validator.required(req.body, "user_id"),
       Validator.required(req.body, "category_id"),
       Validator.required(req.body, "title"),
+      Validator.required(req.body, "slug"),
     ]);
 
     if (!validation.pass) {

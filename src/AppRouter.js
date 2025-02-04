@@ -36,6 +36,8 @@ admin.post("/res/resources", ResourceController.create);
 admin.get("/res/resource-categories", ResourceCategoryController.list);
 admin.post("/res/resource-categories", ResourceCategoryController.create);
 
+admin.get("/fn/resource-categories-all", ResourceCategoryController.all);
+
 /**
  * Base routes
  */
