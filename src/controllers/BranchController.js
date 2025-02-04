@@ -42,8 +42,9 @@ export default {
     }
 
     const { show, page } = req.query;
-    let name = req.query.name ?? "";
-    let find = req.query.find ?? "";
+    let name = req.query.name || "";
+    let find = req.query.find || "";
+    let sort_by = req.query.sort_by || "name";
 
     let query = `
       SELECT
@@ -61,6 +62,7 @@ export default {
           city LIKE "%${find}%" OR
           state LIKE "%${find}%"
         )
+       ORDER BY ${sort_by} ASC
     `;
 
     MysqlService.paginate(query, "id", show, page)
