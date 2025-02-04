@@ -86,9 +86,7 @@ export default {
    */
   create: (req, res) => {
     let validation = Validator.check([
-      Validator.required(req.body, "user_id"),
-      Validator.required(req.body, "category_id"),
-      Validator.required(req.body, "title"),
+      Validator.required(req.body, "name"),
     ]);
 
     if (!validation.pass) {
@@ -97,9 +95,9 @@ export default {
       return res.json(message);
     }
 
-    MysqlService.create("resources", req.body)
+    MysqlService.create("resource_categories", req.body)
       .then((response) => {
-        let message = Logger.message(req, res, 200, "resource", response.insertId);
+        let message = Logger.message(req, res, 200, "resource_category", response.insertId);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
