@@ -21,6 +21,7 @@ var statements = [
     "title VARCHAR(255) NOT NULL",
     "slug VARCHAR(255) NOT NULL UNIQUE",
     "body TEXT NULL",
+    "media LONGTEXT NULL",
     "additional_fields LONGTEXT NULL",
     "link VARCHAR(255) NULL",
     "status VARCHAR(255) NULL",
