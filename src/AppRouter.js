@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import { app } from "./Server.js";
 
@@ -10,14 +12,20 @@ import Controller from "./controllers/Controller.js";
 import ResourceController from "./controllers/ResourceController.js";
 import ResourceCategoryController from "./controllers/ResourceCategoryController.js";
 
+const portal = express.Router();
+const admin = express.Router();
+
+// Get the parent folder path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 if (process.env.APP_ENV === "dev") {
   app.use(cors());
 }
 
 app.use(bodyParser.json());
 
-const portal = express.Router();
-const admin = express.Router();
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 /**
  * Portal routes

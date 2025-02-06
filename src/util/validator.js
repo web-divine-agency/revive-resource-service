@@ -16,17 +16,8 @@ export default {
    * @param {*} field
    * @returns
    */
-  unique: (req, table, field) => {
-    let found = "valid";
-
-    table.forEach((doc) => {
-      if (doc[field] == req[field]) {
-        found = `${field} is existing`;
-        return;
-      }
-    });
-
-    return found;
+  unique: (req, result, field) => {
+    return result.length ? { key: field, value: "already exist" } : { key: field, value: "valid" };
   },
 
   /**
@@ -41,6 +32,7 @@ export default {
       if (i.value != "valid") {
         validated[i.key] = i.value;
       }
+      console.log(i);
     });
 
     if (Object.keys(validated).length > 0) {

@@ -1,28 +1,9 @@
-import multer from "multer";
-import path from "path";
-import { fileURLToPath } from "url";
-import moment from "moment";
-
 import Logger from "../util/logger.js";
 import Validator from "../util/validator.js";
 
+import multerUpload from "../config/multer.js";
+
 import MysqlService from "../services/MysqlService.js";
-
-// Get the parent folder path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const folder = path.join(__dirname, ".."); // Moves one level up
-
-const storage = multer.diskStorage({
-  destination: path.join(folder, "uploads"), // Saves in the parent folder
-  filename: (req, file, cb) => {
-    cb(null, `${moment().format("YYYYMMDDhhmmss")}-${file.originalname}`);
-  },
-});
-
-console.log(__filename, __dirname, folder, path.join(folder, "uploads"));
-
-const upload = multer({ storage });
 
 export default {
   /**
@@ -116,17 +97,22 @@ export default {
    * @returns
    */
   create: (req, res) => {
-    upload.array("media[]")(req, res, (error) => {
+    multerUpload.array("media[]")(req, res, async (error) => {
       if (error) {
         let message = Logger.message(req, res, 500, "error", error);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       }
 
+      let resources = await MysqlService.select(
+        `SELECT id FROM resources WHERE slug = "${req.body.slug}"`
+      );
+
       let validation = Validator.check([
         Validator.required(req.body, "user_id"),
         Validator.required(req.body, "category_id"),
         Validator.required(req.body, "title"),
+        Validator.unique(req.body, resources, "slug"),
       ]);
 
       if (!validation.pass) {
@@ -135,17 +121,12 @@ export default {
         return res.json(message);
       }
 
-      req.body.slug = req.body.title
-        .toLowerCase() // Convert to lowercase
-        .trim() // Trim leading and trailing spaces
-        .replace(/[\s\W-]+/g, "-") // Replace spaces and non-word characters with hyphens
-        .replace(/^-+|-+$/g, ""); // Remove leading and trailing hyphens
-
       req.body.media = JSON.stringify(
         req.files.map((file) => ({
           filename: file.originalname,
           mimetype: file.mimetype,
           size: file.size,
+          url: `/uploads/${encodeURI(file.originalname)}`
         }))
       );
 
