@@ -40,6 +40,7 @@ app.use("/admin", admin);
 admin.use(authAdmin);
 admin.get("/res/resources", ResourceController.list);
 admin.post("/res/resources", ResourceController.create);
+admin.get("/res/resources/:resource_slug", ResourceController.read);
 
 admin.get("/res/resource-categories", ResourceCategoryController.list);
 admin.post("/res/resource-categories", ResourceCategoryController.create);

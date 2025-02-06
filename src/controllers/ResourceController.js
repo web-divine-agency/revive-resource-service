@@ -126,7 +126,7 @@ export default {
           filename: file.originalname,
           mimetype: file.mimetype,
           size: file.size,
-          url: `/uploads/${encodeURI(file.originalname)}`
+          url: `/uploads/${encodeURI(file.originalname)}`,
         }))
       );
 
@@ -142,5 +142,50 @@ export default {
           return res.json(message);
         });
     });
+  },
+
+  read: (req, res) => {
+    let validation = Validator.check([Validator.required(req.params, "resource_slug")]);
+
+    if (!validation.pass) {
+      let message = Logger.message(req, res, 422, "error", validation.result);
+      Logger.error([JSON.stringify(message)]);
+      return res.json(message);
+    }
+
+    const { resource_slug } = req.params;
+
+    let query = `
+      SELECT
+        resources.id AS resource_id,
+        resources.category_id,
+        users.id AS user_id,
+        resources.title,
+        resources.slug,
+        resources.body,
+        resources.media,
+        resources.additional_fields,
+        resources.link,
+        resources.status,
+        users.first_name,
+        users.last_name,
+        users.email
+      FROM resources
+      INNER JOIN users ON resources.user_id = users.id
+      WHERE resources.deleted_at IS NULL
+      AND resources.slug = "${resource_slug}"
+    `;
+
+    MysqlService.select(query)
+      .then((response) => {
+        let message = Logger.message(req, res, 200, "resource", response[0]);
+        Logger.out([JSON.stringify(message)]);
+        return res.json(message);
+      })
+      .catch((error) => {
+        let message = Logger.message(req, res, 500, "error", error);
+        Logger.error([JSON.stringify(message)]);
+        return res.json(message);
+      });
   },
 };
