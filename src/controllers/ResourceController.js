@@ -34,8 +34,9 @@ export default {
   list: (req, res) => {
     let validation = Validator.check([
       Validator.required(req.query, "category_id"),
+      Validator.required(req.query, "direction"),
+      Validator.required(req.query, "last"),
       Validator.required(req.query, "show"),
-      Validator.required(req.query, "page"),
     ]);
 
     if (!validation.pass) {
@@ -44,9 +45,10 @@ export default {
       return res.json(message);
     }
 
-    const { category_id, show, page } = req.query;
+    const { category_id, last, show } = req.query;
+
     let find = req.query.find || "";
-    let sort_by = req.query.sort_by || "resources.created_at_order";
+    let direction = req.query.direction === "next" ? "<" : ">";
 
     let query = `
       SELECT
@@ -61,23 +63,26 @@ export default {
         resources.status,
         users.first_name,
         users.last_name,
-        users.email
+        users.email,
+        resources.created_at_order
       FROM resources
       INNER JOIN users ON resources.user_id = users.id
       WHERE resources.deleted_at IS NULL
       AND resources.category_id = ${category_id}
       AND 
-        (
-          resources.title LIKE "%${find}%" OR
-          resources.status LIKE "%${find}%" OR
-          users.first_name LIKE "%${find}%" OR
-          users.last_name LIKE "%${find}%" OR
-          users.email LIKE "%${find}%"
-        )
-       ORDER BY ${sort_by} ASC
+      (
+        resources.title LIKE "%${find}%" OR
+        resources.status LIKE "%${find}%" OR
+        users.first_name LIKE "%${find}%" OR
+        users.last_name LIKE "%${find}%" OR
+        users.email LIKE "%${find}%"
+      )
+      AND resources.created_at_order ${direction} ${last}
+      ORDER BY resources.created_at_order DESC
+      LIMIT ${show}
     `;
 
-    MysqlService.paginate(query, "resources.id", show, page)
+    MysqlService.select(query)
       .then((response) => {
         let message = Logger.message(req, res, 200, "resources", response);
         Logger.out([JSON.stringify(message)]);
