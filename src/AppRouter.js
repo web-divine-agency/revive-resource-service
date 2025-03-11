@@ -38,15 +38,15 @@ portal.use(authenticated);
  */
 app.use("/admin", admin);
 admin.use(authAdmin);
-admin.get("/res/resources", ResourceController.list);
-admin.post("/res/resources", ResourceController.create);
-admin.get("/res/resources/:resource_slug", ResourceController.read);
+admin.get("/resources", ResourceController.list);
+admin.post("/resources", ResourceController.create);
+admin.get("/resources/:resource_slug", ResourceController.read);
 
-admin.get("/res/resource-categories", ResourceCategoryController.list);
-admin.post("/res/resource-categories", ResourceCategoryController.create);
-admin.get("/res/resource-categories/:resource_category_id", ResourceCategoryController.read);
-admin.put("/res/resource-categories/:resource_category_id", ResourceCategoryController.update);
-admin.delete("/res/resource-categories/:resource_category_id", ResourceCategoryController.delete);
+admin.get("/resource-categories", ResourceCategoryController.list);
+admin.post("/resource-categories", ResourceCategoryController.create);
+admin.get("/resource-categories/:resource_category_id", ResourceCategoryController.read);
+admin.put("/resource-categories/:resource_category_id", ResourceCategoryController.update);
+admin.delete("/resource-categories/:resource_category_id", ResourceCategoryController.delete);
 
 admin.get("/fn/resource-categories-all", ResourceCategoryController.all);
 

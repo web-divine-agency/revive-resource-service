@@ -1,1 +1,1 @@
-# Revive Pharmacy Resources Management API
+# Revive Pharmacy Resource Service
