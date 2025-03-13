@@ -1,7 +1,7 @@
 import Logger from "../util/logger.js";
 import Validator from "../util/validator.js";
 
-import MysqlService from "../services/MysqlService.js";
+import DatabaseService from "../services/DatabaseService.js";
 
 export default {
   /**
@@ -10,14 +10,18 @@ export default {
    * @param {*} res
    */
   all: (req, res) => {
-    MysqlService.select(`SELECT * FROM resource_categories WHERE deleted_at IS NULL`)
+    let message, query;
+
+    query = `SELECT * FROM resource_categories WHERE deleted_at IS NULL`;
+
+    DatabaseService.select({ query })
       .then((response) => {
-        let message = Logger.message(req, res, 200, "resource_categories", response);
+        message = Logger.message(req, res, 200, "resource_categories", response.data.result);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
       .catch((error) => {
-        let message = Logger.message(req, res, 500, "error", error);
+        message = Logger.message(req, res, 500, "error", error);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       });
@@ -30,24 +34,26 @@ export default {
    * @returns
    */
   list: (req, res) => {
-    let validation = Validator.check([
+    let message, validation, find, direction, query;
+
+    validation = Validator.check([
       Validator.required(req.query, "direction"),
       Validator.required(req.query, "last"),
       Validator.required(req.query, "show"),
     ]);
 
     if (!validation.pass) {
-      let message = Logger.message(req, res, 422, "error", validation.result);
+      message = Logger.message(req, res, 422, "error", validation.result);
       Logger.error([JSON.stringify(message)]);
       return res.json(message);
     }
 
     const { last, show } = req.query;
 
-    let find = req.query.find || "";
-    let direction = req.query.direction === "next" ? "<" : ">";
+    find = req.query.find || "";
+    direction = req.query.direction === "next" ? "<" : ">";
 
-    let query = `
+    query = `
       SELECT
         *
       FROM resource_categories
@@ -62,9 +68,9 @@ export default {
       LIMIT ${show}
     `;
 
-    MysqlService.select(query)
+    DatabaseService.select({ query })
       .then((response) => {
-        let message = Logger.message(req, res, 200, "resource_categories", response);
+        let message = Logger.message(req, res, 200, "resource_categories", response.data.result);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
@@ -82,17 +88,25 @@ export default {
    * @returns
    */
   create: (req, res) => {
-    let validation = Validator.check([Validator.required(req.body, "name")]);
+    let message, validation;
+
+    validation = Validator.check([Validator.required(req.body, "name")]);
 
     if (!validation.pass) {
-      let message = Logger.message(req, res, 422, "error", validation.result);
+      message = Logger.message(req, res, 422, "error", validation.result);
       Logger.error([JSON.stringify(message)]);
       return res.json(message);
     }
 
-    MysqlService.create("resource_categories", req.body)
+    DatabaseService.create({ table: "resource_categories", data: req.body })
       .then((response) => {
-        let message = Logger.message(req, res, 200, "resource_category", response.insertId);
+        let message = Logger.message(
+          req,
+          res,
+          200,
+          "resource_category",
+          response.data.result.insertId
+        );
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })

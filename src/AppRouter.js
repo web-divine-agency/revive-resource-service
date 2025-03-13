@@ -25,7 +25,7 @@ if (process.env.APP_ENV === "dev") {
 
 app.use(bodyParser.json());
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /**
  * Portal routes
@@ -33,22 +33,24 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 app.use("/portal", portal);
 portal.use(authenticated);
 
+portal.get("/resources", ResourceController.list);
+portal.get("/resources/:resource_slug", ResourceController.read);
+
+portal.get("/resource-categories/all", ResourceCategoryController.all);
+
+portal.get("/resource-categories", ResourceCategoryController.list);
+portal.get("/resource-categories/:resource_category_id", ResourceCategoryController.read);
+
 /**
  * Admin routes
  */
 app.use("/admin", admin);
 admin.use(authAdmin);
-admin.get("/resources", ResourceController.list);
 admin.post("/resources", ResourceController.create);
-admin.get("/resources/:resource_slug", ResourceController.read);
 
-admin.get("/resource-categories", ResourceCategoryController.list);
 admin.post("/resource-categories", ResourceCategoryController.create);
-admin.get("/resource-categories/:resource_category_id", ResourceCategoryController.read);
 admin.put("/resource-categories/:resource_category_id", ResourceCategoryController.update);
 admin.delete("/resource-categories/:resource_category_id", ResourceCategoryController.delete);
-
-admin.get("/fn/resource-categories-all", ResourceCategoryController.all);
 
 /**
  * Base routes

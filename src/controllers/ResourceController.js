@@ -3,23 +3,27 @@ import Validator from "../util/validator.js";
 
 import multerUpload from "../config/multer.js";
 
-import MysqlService from "../services/MysqlService.js";
+import DatabaseService from "../services/DatabaseService.js";
 
 export default {
   /**
-   * List all branches without pagination
+   * List branches without pagination
    * @param {*} req
    * @param {*} res
    */
   all: (req, res) => {
-    MysqlService.select(`SELECT * FROM branches WHERE deleted_at IS NULL`)
+    let message, query;
+
+    query = `SELECT * FROM branches WHERE deleted_at IS NULL`;
+
+    DatabaseService.select({ query })
       .then((response) => {
-        let message = Logger.message(req, res, 200, "branches", response);
+        message = Logger.message(req, res, 200, "branches", response.data.result);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
       .catch((error) => {
-        let message = Logger.message(req, res, 500, "error", error);
+        message = Logger.message(req, res, 500, "error", error);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       });
@@ -32,7 +36,9 @@ export default {
    * @returns
    */
   list: (req, res) => {
-    let validation = Validator.check([
+    let message, validation, find, direction, query;
+
+    validation = Validator.check([
       Validator.required(req.query, "category_id"),
       Validator.required(req.query, "direction"),
       Validator.required(req.query, "last"),
@@ -40,17 +46,17 @@ export default {
     ]);
 
     if (!validation.pass) {
-      let message = Logger.message(req, res, 422, "error", validation.result);
+      message = Logger.message(req, res, 422, "error", validation.result);
       Logger.error([JSON.stringify(message)]);
       return res.json(message);
     }
 
     const { category_id, last, show } = req.query;
 
-    let find = req.query.find || "";
-    let direction = req.query.direction === "next" ? "<" : ">";
+    find = req.query.find || "";
+    direction = req.query.direction === "next" ? "<" : ">";
 
-    let query = `
+    query = `
       SELECT
         resources.id AS resource_id,
         resources.category_id,
@@ -82,9 +88,9 @@ export default {
       LIMIT ${show}
     `;
 
-    MysqlService.select(query)
+    DatabaseService.select({ query })
       .then((response) => {
-        let message = Logger.message(req, res, 200, "resources", response);
+        let message = Logger.message(req, res, 200, "resources", response.data.result);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
@@ -102,18 +108,22 @@ export default {
    * @returns
    */
   create: (req, res) => {
+    let message, validation, resources;
+
     multerUpload.array("media[]")(req, res, async (error) => {
       if (error) {
-        let message = Logger.message(req, res, 500, "error", error);
+        message = Logger.message(req, res, 500, "error", error);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       }
 
-      let resources = await MysqlService.select(
-        `SELECT id FROM resources WHERE slug = "${req.body.slug}"`
-      );
+      resources = (
+        await DatabaseService.select({
+          query: `SELECT id FROM resources WHERE slug = "${req.body.slug}"`,
+        })
+      ).data.result;
 
-      let validation = Validator.check([
+      validation = Validator.check([
         Validator.required(req.body, "user_id"),
         Validator.required(req.body, "category_id"),
         Validator.required(req.body, "title"),
@@ -121,7 +131,7 @@ export default {
       ]);
 
       if (!validation.pass) {
-        let message = Logger.message(req, res, 422, "error", validation.result);
+        message = Logger.message(req, res, 422, "error", validation.result);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       }
@@ -135,32 +145,40 @@ export default {
         }))
       );
 
-      MysqlService.create("resources", req.body)
+      DatabaseService.create({ table: "resources", data: req.body })
         .then((response) => {
-          let message = Logger.message(req, res, 200, "resource", response.insertId);
+          message = Logger.message(req, res, 200, "resource", response.data.result.insertId);
           Logger.out([JSON.stringify(message)]);
           return res.json(message);
         })
         .catch((error) => {
-          let message = Logger.message(req, res, 500, "error", error);
+          message = Logger.message(req, res, 500, "error", error);
           Logger.error([JSON.stringify(message)]);
           return res.json(message);
         });
     });
   },
 
+  /**
+   * Read resource
+   * @param {*} req
+   * @param {*} res
+   * @returns
+   */
   read: (req, res) => {
-    let validation = Validator.check([Validator.required(req.params, "resource_slug")]);
+    let message, validation, query;
+
+    validation = Validator.check([Validator.required(req.params, "resource_slug")]);
 
     if (!validation.pass) {
-      let message = Logger.message(req, res, 422, "error", validation.result);
+      message = Logger.message(req, res, 422, "error", validation.result);
       Logger.error([JSON.stringify(message)]);
       return res.json(message);
     }
 
     const { resource_slug } = req.params;
 
-    let query = `
+    query = `
       SELECT
         resources.id AS resource_id,
         resources.category_id,
@@ -181,14 +199,14 @@ export default {
       AND resources.slug = "${resource_slug}"
     `;
 
-    MysqlService.select(query)
+    DatabaseService.select({ query })
       .then((response) => {
-        let message = Logger.message(req, res, 200, "resource", response[0]);
+        message = Logger.message(req, res, 200, "resource", response.data.result[0]);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
       .catch((error) => {
-        let message = Logger.message(req, res, 500, "error", error);
+        message = Logger.message(req, res, 500, "error", error);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       });
