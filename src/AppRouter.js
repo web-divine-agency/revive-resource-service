@@ -19,9 +19,7 @@ const admin = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-if (process.env.APP_ENV === "dev") {
-  app.use(cors());
-}
+app.use(cors());
 
 app.use(bodyParser.json());
 
