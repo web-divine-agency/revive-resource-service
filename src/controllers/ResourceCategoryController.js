@@ -124,17 +124,19 @@ export default {
    * @returns
    */
   read: (req, res) => {
-    let validation = Validator.check([Validator.required(req.params, "resource_category_id")]);
+    let message, validation, query;
+
+    validation = Validator.check([Validator.required(req.params, "resource_category_id")]);
 
     if (!validation.pass) {
-      let message = Logger.message(req, res, 422, "error", validation.result);
+      message = Logger.message(req, res, 422, "error", validation.result);
       Logger.error([JSON.stringify(message)]);
       return res.json(message);
     }
 
     const { resource_category_id } = req.params;
 
-    let query = `
+    query = `
       SELECT
         *
       FROM resource_categories
@@ -142,27 +144,35 @@ export default {
       AND id = ${resource_category_id}
     `;
 
-    MysqlService.select(query)
+    DatabaseService.select({ query })
       .then((response) => {
-        let message = Logger.message(req, res, 200, "resource_category", response[0]);
+        let message = Logger.message(req, res, 200, "resource_category", response.data.result[0]);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
       .catch((error) => {
-        let message = Logger.message(req, res, 500, "error", error);
+        let message = Logger.message(req, res, 500, "error", error.stack);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       });
   },
 
+  /**
+   * Update resource category
+   * @param {*} req
+   * @param {*} res
+   * @returns
+   */
   update: (req, res) => {
-    let validation = Validator.check([
+    let message, validation;
+
+    validation = Validator.check([
       Validator.required(req.params, "resource_category_id"),
       Validator.required(req.body, "name"),
     ]);
 
     if (!validation.pass) {
-      let message = Logger.message(req, res, 422, "error", validation.result);
+      message = Logger.message(req, res, 422, "error", validation.result);
       Logger.error([JSON.stringify(message)]);
       return res.json(message);
     }
@@ -170,18 +180,18 @@ export default {
     const { resource_category_id } = req.params;
     const { name, description } = req.body;
 
-    MysqlService.update(
-      "resource_categories",
-      { name: name, description: description },
-      { id: resource_category_id }
-    )
+    DatabaseService.update({
+      table: "resource_categories",
+      data: { name: name, description: description },
+      params: { id: resource_category_id },
+    })
       .then(() => {
-        let message = Logger.message(req, res, 200, "updated", true);
+        message = Logger.message(req, res, 200, "updated", true);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       })
       .catch((error) => {
-        let message = Logger.message(req, res, 500, "error", error);
+        message = Logger.message(req, res, 500, "error", error.stack);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       });
@@ -194,24 +204,26 @@ export default {
    * @returns
    */
   delete: (req, res) => {
-    let validation = Validator.check([Validator.required(req.params, "resource_category_id")]);
+    let message, validation;
+
+    validation = Validator.check([Validator.required(req.params, "resource_category_id")]);
 
     if (!validation.pass) {
-      let message = Logger.message(req, res, 422, "error", validation.result);
+      message = Logger.message(req, res, 422, "error", validation.result);
       Logger.error([JSON.stringify(message)]);
       return res.json(message);
     }
 
     const { resource_category_id } = req.params;
 
-    MysqlService.delete("resource_categories", { id: resource_category_id })
+    DatabaseService.delete({ table: "resource_categories", params: { id: resource_category_id } })
       .then(() => {
         let message = Logger.message(req, res, 200, "deleted", true);
         Logger.out([JSON.stringify(message)]);
         return res.json(message);
       })
       .catch((error) => {
-        let message = Logger.message(req, res, 200, "error", error);
+        let message = Logger.message(req, res, 500, "error", error.stack);
         Logger.error([JSON.stringify(message)]);
         return res.json(message);
       });
